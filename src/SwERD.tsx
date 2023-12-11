@@ -1,20 +1,33 @@
-import { useEffect, useRef } from "react"
-import Rect from "./classes/Rect";
+import { useEffect, useRef, useState } from "react"
+import ErdCv from "./classes/ErdCv";
+import Rect from "./classes/elements/Rect";
+import Table from "./classes/elements/Table";
 
 export default function SwERD(){
     const canvas = useRef<HTMLCanvasElement>(null);
+    const [erdCv,setErdCv] = useState<ErdCv>();
 
     useEffect(()=>{
         if(canvas.current){
-            const rect = new Rect(canvas.current, 10,10,100,100);
-            rect.draw();
+            setErdCv(new ErdCv(canvas.current));
         }
     },[]);
 
-    return (
-        <canvas ref={canvas}>
+    function addRect(){
+        if(erdCv && canvas.current){
+            const rect = new Table(canvas.current, 10,10);
+            erdCv?.addElement(rect);
+        }
+    }
 
-        </canvas>
+    return (
+        <div>
+            <button onClick={addRect}>+</button>
+            <br/>
+            <canvas ref={canvas}>
+
+            </canvas>
+        </div>
     )
 }
 

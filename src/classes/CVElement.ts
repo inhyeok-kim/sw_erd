@@ -22,15 +22,15 @@ export default class CVElement {
     draw(){
     }
 
-    click(){
+    click(x:number,y:number){
     }
 
     hover(_isHover : boolean){
     }
 
     move(x:number, y:number){
-        this.x = x;
-        this.y = y;
+        this.x = this.x+x;
+        this.y = this.y+y;
         this.isReRender = true;
     }
 }

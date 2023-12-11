@@ -1,7 +1,8 @@
-import CVElement from "./CVElement";
+import CVElement from "../CVElement";
 
 export default class Rect extends CVElement{
-    color : string = "red";
+    color : string = "black";
+    isFill : boolean = false;
 
     constructor(canvas : HTMLCanvasElement,x : number,y : number,w:number,h:number){
         super(canvas,x,y,w,h);
@@ -16,8 +17,13 @@ export default class Rect extends CVElement{
                 this.path2D.rect(this.x,this.y,this.w,this.h);
                 this.isReRender = false;
             }
-            ctx.fillStyle = this.color;
-            ctx.fill(this.path2D);
+            if(this.isFill){
+                ctx.fillStyle = this.color;
+                ctx.fill(this.path2D);
+            } else {
+                ctx.strokeStyle = this.color;
+                ctx.stroke(this.path2D);
+            }
         }
     }
 
@@ -28,12 +34,12 @@ export default class Rect extends CVElement{
     }
 
     hover(_isHover : boolean){
-        if(this.isHover != _isHover){
+        if(this.isHover !== _isHover){
             this.isHover = _isHover;
             if(_isHover){
-                this.color = 'green';
+                this.color = 'red';
             } else {
-                this.color = 'red'
+                this.color = 'black'
             }
             this.isReRender = true;
         }
