@@ -1,18 +1,22 @@
+import { setState } from "../GlobalState";
 import CVElement from "./CVElement"
-import Rect from "./elements/Rect";
 
 export default class MouseObject {
-    x:number = 0;
-    y:number = 0;
-    isDown : boolean = false;
-    clickTarget : null | CVElement = null;
-    downTarget : null | CVElement = null;
-    hoverTarget : null | CVElement = null;
-    downTargetGapX : number = 0;
-    downTargetGapY : number = 0;
     canvas : HTMLCanvasElement;
     cvElementList : CVElement[];
     ctx : CanvasRenderingContext2D;
+
+    eventContext : EventContext = {
+        x : 0,
+        y : 0,
+        isContext : false,
+        isDown  : false,
+        clickTarget : null,
+        downTarget  : null,
+        hoverTarget : null,
+        downTargetGapX  : 0,
+        downTargetGapY  : 0,
+    };
 
     constructor(canvas : HTMLCanvasElement, cvElementList : CVElement[]){
         this.canvas = canvas;
@@ -21,6 +25,8 @@ export default class MouseObject {
         canvas.addEventListener("mousemove",this.onMouseMoveHandler.bind(this));
 
         canvas.addEventListener("click",this.onMouseClickHandler.bind(this));
+
+        canvas.addEventListener("contextmenu",this.onMouseRightClickHandler.bind(this));
         
         canvas.addEventListener("mousedown",this.onMouseDownHandler.bind(this));
 
@@ -28,64 +34,88 @@ export default class MouseObject {
     }
 
     private onMouseMoveHandler(e : MouseEvent){
-        this.x = e.offsetX;
-        this.y = e.offsetY;
-        this.hoverElementOnMouseMove();
+        this.eventContext.x = e.offsetX;
+        this.eventContext.y = e.offsetY;
+        this.emitHoverOnElement();
         this.moveElementOnMouseMove(e);
     }
 
+    private onMouseRightClickHandler(e : MouseEvent){
+        e.preventDefault();
+        this.eventContext.isContext = true;
+        setState("contextmenu",this.eventContext);
+    }
     private onMouseClickHandler(e : MouseEvent){
-        if(this.hoverTarget){
-            this.clickTarget = this.hoverTarget;
-            (this.hoverTarget as CVElement).click(this.x, this.y);
+        if(this.eventContext.hoverTarget){
+            this.eventContext.clickTarget = this.eventContext.hoverTarget;
+            (this.eventContext.hoverTarget as CVElement).click(this.eventContext.x, this.eventContext.y);
         } else {
-            this.clickTarget = null;
+            this.eventContext.clickTarget = null;
         }
     }
 
     private onMouseDownHandler(e : MouseEvent){
-        this.isDown = true;
-        if(this.hoverTarget){
-            this.downTarget = this.hoverTarget;
-            this.downTargetGapX = e.offsetX - (this.hoverTarget as CVElement).x;
-            this.downTargetGapY = e.offsetY - (this.hoverTarget as CVElement).y;
+        this.eventContext.isDown = true;
+        if(this.eventContext.hoverTarget){
+            this.eventContext.downTarget = this.eventContext.hoverTarget;
+            this.eventContext.downTargetGapX = e.offsetX - (this.eventContext.hoverTarget as CVElement).x;
+            this.eventContext.downTargetGapY = e.offsetY - (this.eventContext.hoverTarget as CVElement).y;
+
+            // go to upper
+            const targetIdx = this.cvElementList.findIndex(v=>v===this.eventContext.downTarget);
+            this.cvElementList.splice(targetIdx,1);
+            this.cvElementList.push(this.eventContext.downTarget);
+
+            this.eventContext.downTarget.mouseDown();
         } else {
-            this.downTarget = null;
+            this.eventContext.downTarget = null;
         }
     }
 
     private onMouseUpHandler(e : MouseEvent){
-        this.isDown = false;
-        this.downTarget = null;
+        this.eventContext.isDown = false;
+        this.eventContext.downTarget = null;
     }
 
     moveElementOnMouseMove(e:MouseEvent){
-        if(this.isDown && this.downTarget){
+        if(this.eventContext.isDown && this.eventContext.downTarget){
             // (this.downTarget as CVElement).move(this.downTargetGapX,this.downTargetGapY);
-            (this.downTarget as CVElement).move(e.movementX,e.movementY);
+            (this.eventContext.downTarget as CVElement).move(e.movementX,e.movementY);
         }
     }
-    hoverElementOnMouseMove(){
-        if(!this.downTarget){
+    emitHoverOnElement(){
+        if(!this.eventContext.downTarget){
             let hoverFlag = false;
             for(let i=this.cvElementList.length-1; i >= 0; i--){
                 const ele = this.cvElementList[i];
                 if(!hoverFlag){
-                const isPointInPath = this.ctx.isPointInPath(ele.path2D,this.x, this.y);
+                const isPointInPath = this.ctx.isPointInPath(ele.path2D,this.eventContext.x, this.eventContext.y);
                     if(isPointInPath){
-                        ele.hover(true);
+                        ele.hover(this.eventContext);
                         hoverFlag = true;
-                        this.hoverTarget = ele;
+                        this.eventContext.hoverTarget = ele;
                     } else {
-                        ele.hover(false);
+                        ele.unHover(this.eventContext);
                     }
                 } else {
-                    ele.hover(false);
+                    ele.unHover(this.eventContext);
                 }
             }
-            if(!hoverFlag) this.hoverTarget = null;
+            if(!hoverFlag) this.eventContext.hoverTarget = null;
         }
     }
     
 
+}
+
+export interface EventContext {
+    x:number
+    y:number
+    isContext : boolean
+    isDown : boolean
+    clickTarget : null | CVElement
+    downTarget : null | CVElement
+    hoverTarget : null | CVElement
+    downTargetGapX : number
+    downTargetGapY : number
 }

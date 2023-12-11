@@ -1,7 +1,7 @@
 import CVElement from "../CVElement";
 import { EventContext } from "../MouseObject";
 
-export default class Rect extends CVElement{
+export default class ContextMenu extends CVElement{
     color : string = "black";
     isFill : boolean = false;
 

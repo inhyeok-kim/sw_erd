@@ -1,4 +1,5 @@
 import CVElement from "../CVElement";
+import { EventContext } from "../MouseObject";
 import Text from "./Text";
 
 export default class Table extends CVElement{
@@ -32,13 +33,10 @@ export default class Table extends CVElement{
                 this.path2D.rect(this.x,this.y,this.w,this.h);
                 this.isReRender = false;
             }
-            if(this.isFill){
-                ctx.fillStyle = this.color;
-                ctx.fill(this.path2D);
-            } else {
-                ctx.strokeStyle = this.color;
-                ctx.stroke(this.path2D);
-            }
+            ctx.fillStyle = "white";
+            ctx.fill(this.path2D);
+            ctx.strokeStyle = this.color;
+            ctx.stroke(this.path2D);
             this.children.forEach(child=>child.draw());
         }
     }
@@ -56,16 +54,15 @@ export default class Table extends CVElement{
         }
     }
 
-    hover(_isHover : boolean){
-        if(this.isHover !== _isHover){
-            this.isHover = _isHover;
-            if(_isHover){
-                this.color = 'red';
-            } else {
-                this.color = 'black'
-            }
-            this.isReRender = true;
-        }
+    unHover(context : EventContext){
+        this.isHover = false;
+        this.color = 'black';
+        this.isReRender = true;
+    }
+    hover(context : EventContext){
+        this.isHover = true;
+        this.color = 'red';
+        this.isReRender = true;
     }
 
 }

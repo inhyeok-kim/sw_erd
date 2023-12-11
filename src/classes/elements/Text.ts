@@ -1,4 +1,5 @@
 import CVElement from "../CVElement";
+import { EventContext } from "../MouseObject";
 
 export default class Text extends CVElement{
     color : string = "black";
@@ -51,7 +52,7 @@ export default class Text extends CVElement{
             input.style.height = "10px";
             input.value = this.text;
             input.style.fontSize = '10px';
-            document.querySelector(".App")!.append(input);
+            document.body.append(input);
             input.focus();
             input.addEventListener("focusout",this.focusOut.bind(this));
         }
@@ -62,16 +63,15 @@ export default class Text extends CVElement{
         e.currentTarget!.remove();
     }
 
-    hover(_isHover : boolean){
-        if(this.isHover !== _isHover){
-            this.isHover = _isHover;
-            if(_isHover){
-                this.color = 'red';
-            } else {
-                this.color = 'black'
-            }
-            this.isReRender = true;
-        }
+    unHover(context : EventContext){
+        this.isHover = false;
+        this.color = 'black';
+        this.isReRender = true;
+    }
+    hover(context : EventContext){
+        this.isHover = true;
+        this.color = 'red';
+        this.isReRender = true;
     }
 
 }

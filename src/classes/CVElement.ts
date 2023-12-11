@@ -1,3 +1,5 @@
+import { EventContext } from "./MouseObject";
+
 export default class CVElement {
     x : number;
     y : number;
@@ -25,12 +27,19 @@ export default class CVElement {
     click(x:number,y:number){
     }
 
-    hover(_isHover : boolean){
+    unHover(context : EventContext){
+        
+    }
+    hover(context : EventContext){
     }
 
     move(x:number, y:number){
         this.x = this.x+x;
         this.y = this.y+y;
         this.isReRender = true;
+    }
+
+    mouseDown(){
+
     }
 }
