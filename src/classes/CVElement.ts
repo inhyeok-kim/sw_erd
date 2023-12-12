@@ -9,7 +9,8 @@ export default class CVElement {
     path2D : Path2D;
     isHover : boolean = false;
     isReRender : boolean = true;
-    canvas : HTMLCanvasElement
+    canvas : HTMLCanvasElement;
+    children : CVElement[] = [];
 
     constructor(canvas : HTMLCanvasElement,x : number,y : number,w:number,h:number){
         this.x = x;
@@ -22,24 +23,31 @@ export default class CVElement {
     }
 
     draw(){
+        if(this.children.length > 0){
+            this.children.forEach(child=>child.draw());
+        }
     }
 
-    click(x:number,y:number){
+    click(context : EventContext){
     }
 
     unHover(context : EventContext){
-        
+        this.children.forEach((child)=>{child.unHover(context)});
     }
     hover(context : EventContext){
     }
 
-    move(x:number, y:number){
-        this.x = this.x+x;
-        this.y = this.y+y;
+    move(movementX:number, movementY:number){
+        this.x = this.x+movementX;
+        this.y = this.y+movementY;
         this.isReRender = true;
     }
 
-    mouseDown(){
+    mouseUp(context : EventContext){
+
+    }
+
+    mouseDown(context : EventContext){
 
     }
 }

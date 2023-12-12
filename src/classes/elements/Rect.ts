@@ -26,23 +26,7 @@ export default class Rect extends CVElement{
                 ctx.stroke(this.path2D);
             }
         }
-    }
-
-    click(){
-        // this.z = this.z === 3 ? this.z = 0 : this.z+1;
-        // oderElements();
-        // this.isReRender = true;
-    }
-
-    unHover(context : EventContext){
-        this.isHover = false;
-        this.color = 'black';
-        this.isReRender = true;
-    }
-    hover(context : EventContext){
-        this.isHover = true;
-        this.color = 'red';
-        this.isReRender = true;
+        super.draw();
     }
 
 }

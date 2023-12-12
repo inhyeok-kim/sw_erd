@@ -1,7 +1,7 @@
 import CVElement from "../CVElement";
 import { EventContext } from "../MouseObject";
 
-export default class Text extends CVElement{
+export default class InputText extends CVElement{
     color : string = "black";
     isFill : boolean = false;
     text : string
@@ -29,18 +29,17 @@ export default class Text extends CVElement{
             if(this.isFill){
                 ctx.fillStyle = this.color;
                 ctx.fillText(this.text, this.x, this.y+10);
-                ctx.fillStyle = this.color;
                 ctx.fill(this.path2D);
             } else {
                 ctx.strokeStyle = this.color;
                 ctx.stroke(this.path2D);
-                ctx.strokeStyle = this.color;
                 ctx.strokeText(this.text,this.x, this.y+10);
             }
         }
+        super.draw();
     }
 
-    click(x:number, y:number){
+    click(context : EventContext){
         if(this.isEditable){
             const input = document.createElement('input');
             const cvy = this.canvas.offsetTop;
@@ -64,14 +63,11 @@ export default class Text extends CVElement{
     }
 
     unHover(context : EventContext){
-        this.isHover = false;
-        this.color = 'black';
-        this.isReRender = true;
+        this.canvas.style.cursor = "";
+        super.unHover(context);
     }
     hover(context : EventContext){
-        this.isHover = true;
-        this.color = 'red';
-        this.isReRender = true;
+        this.canvas.style.cursor = "text";
     }
 
 }

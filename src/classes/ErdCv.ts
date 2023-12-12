@@ -1,5 +1,6 @@
 import CVElement from "./CVElement";
 import MouseObject from "./MouseObject";
+import TableAPI from "./api/TableAPI";
 
 export default class ErdCv {
     canvas : HTMLCanvasElement;
@@ -11,6 +12,7 @@ export default class ErdCv {
         this.canvas = canvas;
         this.ctx = canvas.getContext("2d")!;
         this.mouseObject = new MouseObject(canvas, this.cvElementList);
+        TableAPI.setErdCv(this);
         
         window.requestAnimationFrame(this.drawFrame.bind(this));
     }
