@@ -25,10 +25,10 @@ export default class RectButton extends CVElement{
     draw(){
         const ctx = this.canvas.getContext("2d");
         if(ctx){
+            ctx.lineWidth = 1;
             if(this.isReRender){
                 this.render();
             }
-            ctx.font = "10px";
             if(this.isFill){
                 ctx.fillStyle = this.color;
                 ctx.fill(this.path2D);
@@ -36,16 +36,19 @@ export default class RectButton extends CVElement{
                 ctx.strokeStyle = this.color;
                 ctx.stroke(this.path2D);
             }
+            ctx.textBaseline = 'top';
+            ctx.font = "12px Arial";
             ctx.fillStyle = this.textColor;
-            ctx.fillText(this.text, this.x+10, this.y+((this.h-10)/2)+8);
+            ctx.fillText(this.text, this.x+10, this.y+((this.h - 10)/2));
         }
         super.draw();
     }
 
-    click(context : EventContext){
+    click(context : EventContext) : boolean{
         if(this.onClick){
             this.onClick(context);
         }
+        return false;
     }
 
     unHover(context : EventContext){
@@ -60,6 +63,7 @@ export default class RectButton extends CVElement{
         this.isHover = true;
         this.color = this.hoverColor;
         this.isReRender = true;
+        return false;
     }
 
 }

@@ -28,26 +28,45 @@ export default class CVElement {
         }
     }
 
-    click(context : EventContext){
+    click(context : EventContext) : boolean{
+        return false;
+    }
+    rightClick(context : EventContext) : boolean{
+        return false;
     }
 
     unHover(context : EventContext){
         this.children.forEach((child)=>{child.unHover(context)});
     }
-    hover(context : EventContext){
+    hover(context : EventContext) : boolean{
+        return false;
     }
 
     move(movementX:number, movementY:number){
         this.x = this.x+movementX;
         this.y = this.y+movementY;
+        this.children.forEach(child=>{
+            child.move(movementX,movementY);
+        })
         this.isReRender = true;
     }
 
-    mouseUp(context : EventContext){
-
+    moveTo(x:number, y:number){
+        const gapX = x - this.x;
+        const gapY = y - this.y;
+        this.x = x;
+        this.y = y;
+        this.children.forEach(child=>{
+            child.move(gapX,gapY);
+        })
+        this.isReRender = true;
     }
 
-    mouseDown(context : EventContext){
+    mouseUp(context : EventContext) : boolean {
+        return false
+    }
 
+    mouseDown(context : EventContext) : boolean{
+        return false;
     }
 }

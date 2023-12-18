@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState } from "react"
 import ErdCv from "./classes/ErdCv";
-import Table from "./classes/elements/Table";
 
 export default function SwERD(){
     const canvas = useRef<HTMLCanvasElement>(null);
@@ -27,6 +26,7 @@ export default function SwERD(){
 
     return (
         <div style={{width : '100%',height : '100%',textAlign:'center'}} >
+            <button onClick={()=>{console.log(erdCv?.getElementList())}}>get</button>
             <canvas ref={canvas} style={{border:'1px solid black'}} >
 
             </canvas>

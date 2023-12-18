@@ -10,10 +10,10 @@ export default class ErdCv {
 
     constructor(canvas : HTMLCanvasElement){
         this.canvas = canvas;
+        canvas.style.background = 'rgba(251, 246, 239,0.5)';
         this.ctx = canvas.getContext("2d")!;
         this.mouseObject = new MouseObject(canvas, this.cvElementList);
         TableAPI.setErdCv(this);
-        
         window.requestAnimationFrame(this.drawFrame.bind(this));
     }
 
@@ -27,6 +27,14 @@ export default class ErdCv {
     
     addElement(elem : CVElement){
         this.cvElementList.push(elem);
+    }
+
+    deleteElement(target : CVElement){
+        this.cvElementList.splice(this.cvElementList.findIndex(elem=>elem==target),1)
+    }
+
+    getElementList(){
+        return this.cvElementList;
     }
 
 }

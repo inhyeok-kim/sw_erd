@@ -1,7 +1,7 @@
 import CVElement from "./CVElement"
 import { moveAll, resetMovement } from "./Movement";
 import ContextAPI from "./api/ContextAPI";
-import ContextMenu from "./elements/ContextMenu";
+import ContextMenu, { ContextMode } from "./elements/ContextMenu";
 
 export default class MouseObject {
     canvas : HTMLCanvasElement;
@@ -9,7 +9,7 @@ export default class MouseObject {
     ctx : CanvasRenderingContext2D;
     isDown : boolean = false;
     isContextMenu : boolean = false;
-    contextElement? : CVElement;
+    contextElement? : ContextMenu;
     hoverContext : EventContext = {
         targetList : [],
         lastTarget : undefined,
@@ -18,6 +18,13 @@ export default class MouseObject {
         event : undefined
     };
     clickContext : EventContext = {
+        targetList : [],
+        lastTarget : undefined,
+        firstTarget : undefined,
+        isCapturing : false,
+        event : undefined
+    };
+    rightClickContext : EventContext = {
         targetList : [],
         lastTarget : undefined,
         firstTarget : undefined,
@@ -66,12 +73,12 @@ export default class MouseObject {
         this.moveElementOnMouseMove(e);
     }
 
-    private openContextMenu(e : MouseEvent){
+    openContextMenu(e : EventContext,mode : ContextMode){
         if(this.isContextMenu){
             this.cvElementList.pop();
         }
         this.isContextMenu = true;
-        this.contextElement = new ContextMenu(this.canvas,e.offsetX,e.offsetY)
+        this.contextElement = new ContextMenu(this.canvas,e.event!.offsetX,e.event!.offsetY,e,mode);
         this.cvElementList.push(this.contextElement);
     }
 
@@ -81,9 +88,32 @@ export default class MouseObject {
         this.contextElement = undefined;
     }
 
+    setContextMode(mode : ContextMode){
+        this.contextElement!.mode = mode;
+    }
+
     private onMouseRightClickHandler(e : MouseEvent){
         e.preventDefault();
-        this.openContextMenu(e);
+        this.rightClickContext.event = e;
+        this.rightClickContext.isCapturing = false;
+        if(this.hoverContext.targetList.length > 0){
+            this.rightClickContext.targetList = [...this.hoverContext.targetList];
+            this.rightClickContext.firstTarget = this.rightClickContext.targetList[0];
+            this.rightClickContext.lastTarget = this.rightClickContext.targetList[this.rightClickContext.targetList.length-1];
+            this.rightClickContext.targetList.forEach((ele,i)=>{
+                if(i>0){
+                    if(!this.rightClickContext.isCapturing) return;
+                }
+                const isCapturing = ele.rightClick(this.rightClickContext);
+                this.rightClickContext.isCapturing = isCapturing;
+
+            });
+        } else {
+            this.rightClickContext.targetList = [];
+            this.rightClickContext.lastTarget = undefined;
+            this.rightClickContext.firstTarget = undefined;
+            this.openContextMenu(this.rightClickContext,'ground');
+        }
     }
     private onMouseClickHandler(e : MouseEvent){
         this.clickContext.event = e;
@@ -95,10 +125,10 @@ export default class MouseObject {
             this.clickContext.targetList.forEach((ele,i)=>{
                 if(i>0){
                     if(!this.clickContext.isCapturing) return;
-                    ele.click(this.clickContext);
-                } else {
-                    ele.click(this.clickContext);
                 }
+                const isCapturing = ele.click(this.clickContext);
+                this.clickContext.isCapturing = isCapturing;
+
             });
         }
     }
@@ -128,10 +158,9 @@ export default class MouseObject {
                 this.downContext.targetList.forEach((ele,i)=>{
                     if(i>0){
                         if(!this.downContext.isCapturing) return;
-                        ele.mouseDown(this.downContext);
-                    } else {
-                        ele.mouseDown(this.downContext);
                     }
+                    const isCapturing = ele.mouseDown(this.downContext);
+                    this.downContext.isCapturing = isCapturing;
                 });
             }
         }
@@ -149,10 +178,9 @@ export default class MouseObject {
             this.upContext.targetList.forEach((ele,i)=>{
                 if(i>0){
                     if(!this.upContext.isCapturing) return;
-                    ele.mouseUp(this.upContext);
-                } else {
-                    ele.mouseUp(this.upContext);
                 }
+                const isCapturing = ele.mouseUp(this.upContext);
+                this.upContext.isCapturing = isCapturing;
             });
         }
     }
@@ -171,16 +199,16 @@ export default class MouseObject {
             this.hoverContext.lastTarget = this.hoverContext.targetList[this.hoverContext.targetList.length-1];
             hoverList.forEach((ele,i)=>{
                 if(i>0){
-                    if(!this.downContext.isCapturing) return;
-                    ele.hover(this.hoverContext);
-                } else {
-                    ele.hover(this.hoverContext);
+                    if(!this.hoverContext.isCapturing) return;
                 }
+                const isCapturing = ele.hover(this.hoverContext);
+                this.hoverContext.isCapturing = isCapturing;
             });
         } else {
             this.hoverContext.targetList = [];
             this.hoverContext.firstTarget = undefined;
             this.hoverContext.lastTarget = undefined;
+            
         }
     }
 
