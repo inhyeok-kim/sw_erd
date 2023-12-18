@@ -10,8 +10,7 @@ export default class Rect extends CVElement{
         this.path2D.rect(this.x,this.y,this.w,this.h);
     }
 
-    draw(){
-        const ctx = this.canvas.getContext("2d");
+    draw(ctx : CanvasRenderingContext2D){
         if(ctx){
             if(this.isReRender){
                 this.path2D = new Path2D();
@@ -26,7 +25,7 @@ export default class Rect extends CVElement{
                 ctx.stroke(this.path2D);
             }
         }
-        super.draw();
+        super.draw(ctx);
     }
 
 }

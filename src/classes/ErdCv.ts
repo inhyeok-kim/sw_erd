@@ -12,17 +12,28 @@ export default class ErdCv {
         this.canvas = canvas;
         canvas.style.background = 'rgba(251, 246, 239,0.5)';
         this.ctx = canvas.getContext("2d")!;
-        this.mouseObject = new MouseObject(canvas, this.cvElementList);
+        this.mouseObject = new MouseObject(this,canvas, this.cvElementList);
         TableAPI.setErdCv(this);
         window.requestAnimationFrame(this.drawFrame.bind(this));
     }
-
+    
     private drawFrame(){
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+        this.ctx.save();
         this.cvElementList.forEach(ele=>{
-            ele.draw();
+            ele.draw(this.ctx);
         });
         window.requestAnimationFrame(this.drawFrame.bind(this));
+    }
+
+    plusScale(){
+        this.ctx.scale(0.9,0.9);
+    }
+    minusScale(){
+        this.ctx.scale(1.1,1.1);
+    }
+    movement(x:number,y:number){
+        this.ctx.translate(x,y);
     }
     
     addElement(elem : CVElement){

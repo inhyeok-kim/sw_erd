@@ -22,8 +22,7 @@ export default class RectButton extends CVElement{
         this.isReRender = false;
     }
 
-    draw(){
-        const ctx = this.canvas.getContext("2d");
+    draw(ctx : CanvasRenderingContext2D){
         if(ctx){
             ctx.lineWidth = 1;
             if(this.isReRender){
@@ -41,7 +40,7 @@ export default class RectButton extends CVElement{
             ctx.fillStyle = this.textColor;
             ctx.fillText(this.text, this.x+10, this.y+((this.h - 10)/2));
         }
-        super.draw();
+        super.draw(ctx);
     }
 
     click(context : EventContext) : boolean{

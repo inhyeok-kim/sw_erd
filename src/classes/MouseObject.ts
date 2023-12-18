@@ -1,9 +1,11 @@
 import CVElement from "./CVElement"
+import ErdCv from "./ErdCv";
 import { moveAll, resetMovement } from "./Movement";
 import ContextAPI from "./api/ContextAPI";
 import ContextMenu, { ContextMode } from "./elements/ContextMenu";
 
 export default class MouseObject {
+    erdCv : ErdCv
     canvas : HTMLCanvasElement;
     cvElementList : CVElement[];
     ctx : CanvasRenderingContext2D;
@@ -46,31 +48,48 @@ export default class MouseObject {
         event : undefined
     };
 
-    constructor(canvas : HTMLCanvasElement, cvElementList : CVElement[]){
+    constructor(erdCv : ErdCv, canvas : HTMLCanvasElement, cvElementList : CVElement[]){
+        this.erdCv = erdCv;
         ContextAPI.setMouseObject(this);
         this.canvas = canvas;
         this.cvElementList = cvElementList;
         this.ctx = canvas.getContext("2d")!;
         canvas.addEventListener("mousemove",this.onMouseMoveHandler.bind(this));
-
         canvas.addEventListener("click",this.onMouseClickHandler.bind(this));
-
         canvas.addEventListener("contextmenu",this.onMouseRightClickHandler.bind(this));
-        
         canvas.addEventListener("mousedown",this.onMouseDownHandler.bind(this));
-
         canvas.addEventListener("mouseup",this.onMouseUpHandler.bind(this));
         canvas.addEventListener("mouseleave",this.onMouseLeaveHandler.bind(this))
+        canvas.addEventListener("wheel",this.onWheelHandler.bind(this))
     }
 
+    private onWheelHandler(e:WheelEvent){
+        // -이면 마우스업 + 면 마우스 다운 -면 확대 +면 축소
+        if(e.deltaY > 0){
+            this.erdCv.plusScale();
+        } else {
+            this.erdCv.minusScale();
+        }
+        
+    }
     private onMouseLeaveHandler(e : MouseEvent){
         resetMovement();
+        this.isDown = false;
     }
 
     private onMouseMoveHandler(e : MouseEvent){
         this.hoverContext.event = e;
         this.emitHoverOnElement(e);
         this.moveElementOnMouseMove(e);
+        this.moveCanvas(e);
+    }
+
+    private moveCanvas(e : MouseEvent){
+        if(this.isDown){
+            if(this.downContext.targetList.length ===0){
+                this.erdCv.movement(e.movementX,e.movementY);
+            }
+        }
     }
 
     openContextMenu(e : EventContext,mode : ContextMode){
@@ -94,8 +113,13 @@ export default class MouseObject {
 
     private onMouseRightClickHandler(e : MouseEvent){
         e.preventDefault();
-        this.rightClickContext.event = e;
-        this.rightClickContext.isCapturing = false;
+        this.rightClickContext = {
+            targetList : [],
+            lastTarget : undefined,
+            firstTarget : undefined,
+            isCapturing : false,
+            event : e
+        }
         if(this.hoverContext.targetList.length > 0){
             this.rightClickContext.targetList = [...this.hoverContext.targetList];
             this.rightClickContext.firstTarget = this.rightClickContext.targetList[0];
@@ -109,15 +133,17 @@ export default class MouseObject {
 
             });
         } else {
-            this.rightClickContext.targetList = [];
-            this.rightClickContext.lastTarget = undefined;
-            this.rightClickContext.firstTarget = undefined;
             this.openContextMenu(this.rightClickContext,'ground');
         }
     }
     private onMouseClickHandler(e : MouseEvent){
-        this.clickContext.event = e;
-        this.clickContext.isCapturing = false;
+        this.clickContext = {
+            targetList : [],
+            lastTarget : undefined,
+            firstTarget : undefined,
+            isCapturing : false,
+            event : e
+        }
         if(this.hoverContext.targetList.length > 0){
             this.clickContext.targetList = [...this.hoverContext.targetList];
             this.clickContext.firstTarget = this.clickContext.targetList[0];
@@ -136,8 +162,13 @@ export default class MouseObject {
     private onMouseDownHandler(e : MouseEvent){
         if(e.button !== 2){
             this.isDown = true;
-            this.downContext.event = e;
-            this.downContext.isCapturing = false;
+            this.downContext = {
+                targetList : [],
+                lastTarget : undefined,
+                firstTarget : undefined,
+                isCapturing : false,
+                event : e
+            }
             if(this.isContextMenu){
                 if(this.hoverContext.targetList.length === 0 || !this.hoverContext.targetList.find(v=>v===this.contextElement)){
                     this.closeContextMenu();

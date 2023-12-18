@@ -95,9 +95,9 @@ export default class ContextMenu extends CVElement{
         this.isReRender = false;
     }
 
-    draw(){
-        const ctx = this.canvas.getContext("2d");
+    draw(ctx : CanvasRenderingContext2D){
         if(ctx){
+            ctx.restore();
             if(this.isReRender){
                 this.render();
             }
@@ -105,8 +105,9 @@ export default class ContextMenu extends CVElement{
             ctx.fill(this.path2D);
             ctx.strokeStyle = this.color;
             ctx.stroke(this.path2D);
+            
         }
-        super.draw();
+        super.draw(ctx);
     }
 
 

@@ -19,8 +19,7 @@ export default class RelationLine extends CVElement{
         this.isReRender = false;
     }
 
-    draw(){
-        const ctx = this.canvas.getContext("2d");
+    draw(ctx : CanvasRenderingContext2D){
         if(ctx){
             if(this.isReRender){
                 this.render();
@@ -28,7 +27,7 @@ export default class RelationLine extends CVElement{
             ctx.strokeStyle = this.color;
             ctx.stroke(this.path2D);
         }
-        super.draw();
+        super.draw(ctx);
     }
 
 }

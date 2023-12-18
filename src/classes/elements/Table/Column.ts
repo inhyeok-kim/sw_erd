@@ -25,8 +25,7 @@ export default class Column extends CVElement{
         this.isReRender = false;
     }
 
-    draw(){
-        const ctx = this.canvas.getContext("2d");
+    draw(ctx : CanvasRenderingContext2D){
         if(ctx){
             if(this.isReRender){
                 this.render();
@@ -34,7 +33,7 @@ export default class Column extends CVElement{
             ctx.fillStyle = this.color;
             ctx.fill(this.path2D);
         }
-        super.draw();
+        super.draw(ctx);
     }
 
     rightClick(context: EventContext): boolean {

@@ -23,8 +23,7 @@ export default class TableHeader extends CVElement{
         this.isReRender = false;
     }
 
-    draw(){
-        const ctx = this.canvas.getContext("2d");
+    draw(ctx : CanvasRenderingContext2D){
         if(ctx){
             if(this.isReRender){
                 this.render();
@@ -37,7 +36,7 @@ export default class TableHeader extends CVElement{
                 ctx.stroke(this.path2D);
             }
         }
-        super.draw();
+        super.draw(ctx);
     }
 
     unHover(context : EventContext){

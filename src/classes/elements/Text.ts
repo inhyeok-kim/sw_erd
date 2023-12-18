@@ -33,8 +33,7 @@ export default class Text extends CVElement{
         }
     }
 
-    draw(){
-        const ctx = this.canvas.getContext("2d");
+    draw(ctx : CanvasRenderingContext2D){
         if(ctx){
             if(this.isReRender){
                 this.render();
@@ -46,7 +45,7 @@ export default class Text extends CVElement{
             ctx.fillStyle = this.fontColor;
             ctx.fillText(this.text, this.x, this.y);
         }
-        super.draw();
+        super.draw(ctx);
     }
 
     click(context : EventContext) : boolean{

@@ -22,9 +22,9 @@ export default class CVElement {
         this.canvas = canvas;
     }
 
-    draw(){
+    draw(ctx : CanvasRenderingContext2D){
         if(this.children.length > 0){
-            this.children.forEach(child=>child.draw());
+            this.children.forEach(child=>child.draw(ctx));
         }
     }
 
