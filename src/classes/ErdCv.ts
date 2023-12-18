@@ -1,51 +1,34 @@
-import CVElement from "./CVElement";
-import MouseObject from "./MouseObject";
-import TableAPI from "./api/TableAPI";
+import Konva from "konva";
+import { Stage } from "konva/lib/Stage";
 
 export default class ErdCv {
-    canvas : HTMLCanvasElement;
-    mouseObject : MouseObject;
-    cvElementList : CVElement[] = [];
-    ctx : CanvasRenderingContext2D;
+    stage : Stage;
 
-    constructor(canvas : HTMLCanvasElement){
-        this.canvas = canvas;
-        canvas.style.background = 'rgba(251, 246, 239,0.5)';
-        this.ctx = canvas.getContext("2d")!;
-        this.mouseObject = new MouseObject(this,canvas, this.cvElementList);
-        TableAPI.setErdCv(this);
-        window.requestAnimationFrame(this.drawFrame.bind(this));
-    }
-    
-    private drawFrame(){
-        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-        this.ctx.save();
-        this.cvElementList.forEach(ele=>{
-            ele.draw(this.ctx);
+    constructor(stage: Stage){
+        this.stage = stage;
+        
+        const layer = new Konva.Layer();
+        const rect = new Konva.Rect({
+            x: 20,
+            y: 20,
+            width: 100,
+            height: 50,
+            fill: 'green',
+            stroke: 'black',
+            strokeWidth: 4,
+            draggable : true
         });
-        window.requestAnimationFrame(this.drawFrame.bind(this));
-    }
+        layer.add(rect);
+        this.stage.add(layer);
 
-    plusScale(){
-        this.ctx.scale(0.9,0.9);
-    }
-    minusScale(){
-        this.ctx.scale(1.1,1.1);
-    }
-    movement(x:number,y:number){
-        this.ctx.translate(x,y);
+        var anim = new Konva.Animation(function(frame) {
+            var time = frame!.time,
+                timeDiff = frame!.timeDiff,
+                frameRate = frame!.frameRate;
+            // update stuff
+          }, layer);
+        
+        anim.start();
     }
     
-    addElement(elem : CVElement){
-        this.cvElementList.push(elem);
-    }
-
-    deleteElement(target : CVElement){
-        this.cvElementList.splice(this.cvElementList.findIndex(elem=>elem==target),1)
-    }
-
-    getElementList(){
-        return this.cvElementList;
-    }
-
 }
