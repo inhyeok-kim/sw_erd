@@ -13,6 +13,7 @@ export default function SwERD(){
             container : 'erdcanvas',
             width : 500,
             height : 500,
+            draggable : true,
         })
         setStage(stage);
         setErdCv(new ErdCv(stage));
@@ -35,9 +36,16 @@ export default function SwERD(){
         stage?.height(window.innerHeight-100);
     }
 
+    function resetScale(){
+        // stage?.scale({x:1,y:1});
+        stage?.x(0);
+        stage?.y(0);
+    }
+
     return (
         <div style={{width : '100%',height : '100%',textAlign:'center'}} >
-            <div ref={container} id={'erdcanvas'} style={{width:'500px', height:'500px'}} >
+            <button onClick={resetScale}>test</button>
+            <div ref={container} id={'erdcanvas'} style={{width:'500px', height:'500px', border:'1px solid black'}} >
 
             </div>
         </div>

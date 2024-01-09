@@ -1,34 +1,77 @@
 import Konva from "konva";
+import { Layer } from "konva/lib/Layer";
 import { Stage } from "konva/lib/Stage";
+import TableManager from "./TableManager";
+import ContextMenuManager from "./ContextMenuManager";
 
 export default class ErdCv {
     stage : Stage;
+    layer : Layer;
+
+    tableManager : TableManager;
+    contextMenuManager : ContextMenuManager;
 
     constructor(stage: Stage){
         this.stage = stage;
         
         const layer = new Konva.Layer();
-        const rect = new Konva.Rect({
-            x: 20,
-            y: 20,
-            width: 100,
-            height: 50,
-            fill: 'green',
-            stroke: 'black',
-            strokeWidth: 4,
-            draggable : true
-        });
-        layer.add(rect);
+        this.layer = layer;
         this.stage.add(layer);
 
-        var anim = new Konva.Animation(function(frame) {
-            var time = frame!.time,
-                timeDiff = frame!.timeDiff,
-                frameRate = frame!.frameRate;
-            // update stuff
-          }, layer);
+        const scaleBy = 1.1;
+        stage.on('wheel', (e) => {
+            // stop default scrolling
+            e.evt.preventDefault();
+    
+            var oldScale = stage.scaleX();
+            var pointer = stage.getPointerPosition();
+    
+            var mousePointTo = {
+              x: (pointer!.x - stage.x()) / oldScale,
+              y: (pointer!.y - stage.y()) / oldScale,
+            };
+    
+            // how to scale? Zoom in? Or zoom out?
+            let direction = e.evt.deltaY < 0 ? 1 : -1;
+    
+            // when we zoom on trackpad, e.evt.ctrlKey is true
+            // in that case lets revert direction
+            if (e.evt.ctrlKey) {
+              direction = -direction;
+            }
+    
+            var newScale = direction > 0 ? oldScale * scaleBy : oldScale / scaleBy;
+            
+    
+            stage.scale({ x: newScale, y: newScale });
+    
+            var newPos = {
+              x: pointer!.x - mousePointTo.x * newScale,
+              y: pointer!.y - mousePointTo.y * newScale,
+            };
+            stage.position(newPos);
+        });
+
+        stage.on("mousedown",(e)=>{
+            if (e.target === stage) {
+                this.stage.container().style.cursor = 'move';
+            }
+        });
+        stage.on("mouseup",(e)=>{
+            if (e.target === stage) {
+                this.stage.container().style.cursor = 'default';
+            }
+        })
+
+
+        this.tableManager = new TableManager(this.stage, this.layer);
+        this.contextMenuManager = new ContextMenuManager(this.stage,this.layer);
+
         
-        anim.start();
+    }
+
+    resetScale(){
+        this.stage.scale({x:1,y:1});
     }
     
 }
