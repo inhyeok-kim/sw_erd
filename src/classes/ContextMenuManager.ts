@@ -4,18 +4,22 @@ import { Layer } from "konva/lib/Layer";
 import { Shape } from "konva/lib/Shape";
 import { Stage } from "konva/lib/Stage";
 import Button from "./elements/Button";
+import ErdCv from "./ErdCv";
 
 export default class ContextMenuManager {
+    erd : ErdCv;
     stage : Stage;
     layer : Layer;
     target : null | Stage | Shape | Group = null;
     contextShape : Shape | null | Group = null;
 
-    constructor(stage: Stage, layer : Layer){
+    constructor(erd : ErdCv, stage: Stage, layer : Layer){
+        this.erd = erd;
         this.stage = stage;
         this.layer = layer;
 
-        stage.on("mousedown",()=>{
+
+        stage.on("mousedown",(e)=>{
             if(this.contextShape){
                 this.closeContextMenu();
             }
@@ -48,7 +52,7 @@ export default class ContextMenuManager {
             x : 0,
             y : 0,
             width: 120,
-            height: 50,
+            height: 25,
             fill: 'white',
             stroke: 'black',
             strokeWidth: 1,
@@ -64,9 +68,17 @@ export default class ContextMenuManager {
             button1.fill("white");
             this.stage.container().style.cursor = 'default';
         });
+        button1.on("click",(e)=>{
+            this.erd.tableManager.addTable(this.contextShape!.x(),this.contextShape!.y());
+            this.stage.container().style.cursor = 'default';
+        });
         group.add(button1);
 
         this.layer.add(group);
+
+        group.on("mousedown",(e)=>{
+            e.cancelBubble = true;
+        });
         return group;
     }
     

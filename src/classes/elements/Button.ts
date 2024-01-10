@@ -52,7 +52,7 @@ export default class Button extends Konva.Group{
         this.textShape.fill(color);
     }
     text(text? : string){
-        if(text == undefined){
+        if(text === undefined){
             return this.textShape.text();
         }
         this.textShape.text(text);

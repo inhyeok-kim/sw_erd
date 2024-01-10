@@ -53,7 +53,7 @@ export default class ErdCv {
         });
 
         stage.on("mousedown",(e)=>{
-            if (e.target === stage) {
+            if (e.target === stage && e.evt.button === 0) {
                 this.stage.container().style.cursor = 'move';
             }
         });
@@ -64,8 +64,8 @@ export default class ErdCv {
         })
 
 
-        this.tableManager = new TableManager(this.stage, this.layer);
-        this.contextMenuManager = new ContextMenuManager(this.stage,this.layer);
+        this.tableManager = new TableManager(this, this.stage, this.layer);
+        this.contextMenuManager = new ContextMenuManager(this, this.stage,this.layer);
 
         
     }
